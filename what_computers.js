@@ -24,7 +24,9 @@ views.link = (block) => `
 
 filters.channel = (block) => block.class == 'Channel'
 views.channel = (block) => `
-<div class='channel block'><h4>${block.title}</h4></div>
+<div class='channel block'>
+<a href='../#!/${block.slug}'><h4>${block.title}</h4></a>
+</div>
 `
 
 filters.media = (block) => block.class == 'Media'
