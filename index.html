@@ -1,0 +1,92 @@
+<!Doctype html>
+<html>
+
+<head>
+	<title>Are.na notetaker</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+
+	*{
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	body {
+		font-family: "Helvetica";
+	}
+
+	.block{
+		border-bottom: 1px solid #ddd;
+		width: 90%;
+		padding: 1em;
+		padding-bottom: 3em;
+		margin-bottom: 1em;
+	}
+
+	.container {
+		width : 90%;
+		margin: auto;
+		display: grid;
+		grid-template-columns: 60% 40%;
+		grid-gap: 2em;
+		height: 100vh;
+	}
+
+	.text-blocks {
+		width : 100%;
+		overflow-y: scroll;
+		padding-top: 5em;
+		height: 100%;
+	}
+
+	.side-bar {
+		padding-top: 5em;
+		width : 100%;
+		overflow-y: scroll;
+	}
+
+	.channel {
+		border: 1px solid black;
+		display: inline-block;
+		width: 150px;
+		aspect-ratio: 1/1;
+	}
+
+	.link {
+		border-bottom: 1px solid blue;
+		padding: .5em;
+		margin: .1em;
+		margin-bottom: .8em;
+	}
+
+	.tag {
+		font-family: monospace;
+		background: #ddd;
+	}
+
+	.media, .attachment {
+		border: 1px solid black;
+		border-radius: 10px;
+		display: inline-block;
+		max-width: 60%;
+	}
+
+	img {
+		width: 100%;
+	}
+
+	p {
+		padding: .3em 0em;
+		line-height: 1.1em;
+	}
+</style>
+
+<body>
+	<div class="container"></div>
+</body>
+
+<script src="./script.js" type="module"></script>
+
+</html>
