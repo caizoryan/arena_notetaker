@@ -165,7 +165,7 @@ views.link = (block) => {
 
 filters.channel = (block) => block.class == 'Channel'
 views.channel = (block) => {
-	let a = dom("a", {href:  `../#!/${block.slug}`}, dom("h4", block.title))
+	let a = dom("a", {href:  `./#!/${block.slug}`}, dom("h4", block.title))
 	let div = dom(".channel.block", a)
 	return div
 }
