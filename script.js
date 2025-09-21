@@ -22,7 +22,7 @@ export let apply = (el, css) => {
 
 let container = document.querySelector('.container')
 let channel
-let slug = "becoming-hypertext"
+export let slug = "becoming-hypertext"
 
 const initpage = () => {
 	page("/", () => {

@@ -1,17 +1,89 @@
+import { slug } from "./script.js";
+
 let filters = {}
 let views = {}
 
-function isNode (el) {
-  return el && el.nodeName && el.nodeType
+let host = "https://api.are.na/v2/"
+
+let localStorageSize = function () {
+   let _lsTotal = 0,_xLen, _x;
+   for (_x in localStorage) {
+   if (!localStorage.hasOwnProperty(_x)) continue;
+       _xLen = (localStorage[_x].length + _x.length) * 2;
+       _lsTotal += _xLen;
+   }
+ return  (_lsTotal / 1024).toFixed(2);
 }
-let dom = (el, ...contents) => {
-	let ell = "div"
+
+if (localStorageSize() > 50) alert("Localstorage filling up... do something about this!")
+console.log("size: ", localStorageSize(), "kb")
+export const update_block = (block, body, slug, fuck = false) => {
+	let history = localStorage.getItem("HISTORY")
+	if (!history){history = {}} 
+	else history = JSON.parse(history)
+
+	if (!history[block.id]) history[block.id] = []
+	history[block.id].push({
+		date: new Date(),
+		// TODO: should probably use last edit... not new edit...
+		...body
+	})
+
+	localStorage.setItem("HISTORY", JSON.stringify(history))
+
+  return fetch(host + `blocks/${block.id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("AUTH"),
+    },
+    method: "PUT",
+    body: JSON.stringify(body),
+  }).then((res) => {
+    if (fuck) { fuck_refresh(slug) }
+    return res
+  });
+};
+
+export const fuck_refresh = (slug) => {
+  fetch(host + "channels/" + slug + "/blocks", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("AUTH"),
+    },
+    method: "POST",
+    body: JSON.stringify({
+      content: "temp",
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      let block_id = data.id;
+      disconnect_block(slug, block_id);
+    });
+};
+export const disconnect_block = (slug, id) => {
+  fetch(host + "channels/" + slug + "/blocks/" + id, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("AUTH"),
+    },
+    method: "DELETE",
+  }).then((res) => {
+    console.log(res)
+  });
+};
+
+let isNode =(el) =>  el && el.nodeName && el.nodeType
+let dom = (tag, ...contents) => {
+	let el = "div"
 	let classes = []
 	let id = ""
-	let parseclass = (str) => {
+
+	let parseclass = ((str) => {
 		let identifiers = str.split(/([\.#]?[^\s#.]+)/).map(e => e.trim()).filter(e => e!= "")
+
 		if(!(/^\.|#/.test(identifiers[0]))) {
-			ell = identifiers[0]
+			el = identifiers[0]
 			identifiers.shift()
 		}
 
@@ -19,26 +91,20 @@ let dom = (el, ...contents) => {
 			if(i[0] == ".") classes.push(i.slice(1))
 			if(i[0] == "#") id = i.slice(1)
 		})
+	})(tag)
 
-	}
+	let doc = document.createElement(el)
 
-	parseclass(el)
-	let d = document.createElement(ell)
-
-	classes.forEach((c) => d.classList.add(c))
-	id ? d.id = id : null
+	classes.forEach((c) => doc.classList.add(c))
+	id ? doc.id = id : null
 
 	contents.forEach((e) => {
-		if (typeof e == 'string') d.innerText += e
-		else if (isNode(e)) d.appendChild(e)
-		else if (typeof e == 'object'){
-			Object.entries(e).map(([k, v]) => {
-				d[k] = v
-			})
-		}
+		if (typeof e == 'string') doc.innerText += e
+		else if (isNode(e)) doc.appendChild(e)
+		else if (typeof e == 'object') Object.entries(e).map(([k, v]) => doc[k] = v)
 	})
 
-	return d
+	return doc
 }
 
 filters.text = (block) => block.class == 'Text'
@@ -57,12 +123,24 @@ views.text = (block) => {
 			btn.innerText = 'edit'
 		}
 	}
+	let save = () => {
+		update_block(block, {content: textarea.value, title: block.title, description: block.description}, slug, true)
+			.then(res => {
+				if (res.status == 204){
+					// remove drafts
+					// then get block and find it in channel.contents and replace and render
+				}
+			})
+	}
 	let inner = dom("div", {innerHTML: block.content_html})
-	let editor = dom("textarea", {value: block.content})
+	let textarea = dom("textarea", {value: block.content})
+	let editor = dom(".editor", 
+									 textarea,
+									 dom("button", {onclick: save}, "save"))
 
 	let div = dom(".text.block", editor, inner)
 
-	let btn = document.createElement("button", {onclick: toggleeditor}, "edit")
+	let btn = dom("button", {onclick: toggleeditor}, "edit")
 	if (localStorage.getItem("ME") == block.user.slug) div.appendChild(btn)
 
 	toggleeditor()
