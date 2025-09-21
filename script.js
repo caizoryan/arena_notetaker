@@ -4,12 +4,11 @@ import page from "./page.js";
 
 let container = document.querySelector('.container')
 let channel
-let slug = "female-rage-oiacsy8egp0"
+let slug = "becoming-hypertext"
 
 const initpage = () => {
 	page("/", () => {
-		slug = ("")
-		container.innerHTML = defaultview
+		init()
 	});
 
 	page("/:slug", (ctx) => {
