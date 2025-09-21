@@ -2,47 +2,127 @@ let filters = {}
 let views = {}
 
 filters.text = (block) => block.class == 'Text'
-views.text = (block) => `
-<div class='block'>
- ${block.content_html}
-</div>
-`
+views.text = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("text")
+	div.classList.add("block")
+
+	let editorstate = true
+	let toggleeditor = () => {
+		editorstate = !editorstate
+		if (editorstate) {
+			inner.style.display = 'none'
+			editor.style.display = 'block'
+			btn.innerText = 'view'
+		}
+		else {
+			editor.style.display = 'none'
+			inner.style.display = 'block'
+			btn.innerText = 'edit'
+		}
+	}
+
+	let inner = document.createElement("div")
+	inner.innerHTML = block.content_html
+	div.appendChild(inner)
+
+	let editor = document.createElement("textarea")
+	editor.value = block.content
+	div.appendChild(editor)
+	
+	let btn = document.createElement("button")
+	btn.innerText = 'edit'
+	btn.onclick = () => toggleeditor()
+
+	if (localStorage.getItem("ME") == block.user.slug)
+	div.appendChild(btn)
+
+	toggleeditor()
+
+	return div
+}
 
 filters.image = (block) => block.class == 'Image'
-views.image = (block) => `
-<div class='block'>
-	<img src='${block.image.thumb.url}'> </img>
-</div>
-`
+views.image = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("image")
+	div.classList.add("block")
+
+	let img = document.createElement("img")
+	img.src = block.image.display.url
+
+	div.appendChild(img)
+	return div
+}
 
 filters.link = (block) => block.class == 'Link'
-views.link = (block) => `
-<div class='link block'>
-	<a href='${block.source.url}' target='_blank'><span>${block.title}</span></a>
-</div>
-`
+views.link = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("link")
+	div.classList.add("block")
+
+	let a = document.createElement("a")
+	a.href = block.source.url
+	a.target = "_blank"
+
+	let span = document.createElement("span")
+	span.textContent = block.title
+
+	a.appendChild(span)
+	div.appendChild(a)
+	return div
+}
 
 filters.channel = (block) => block.class == 'Channel'
-views.channel = (block) => `
-<div class='channel block'>
-<a href='../#!/${block.slug}'><h4>${block.title}</h4></a>
-</div>
-`
+views.channel = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("channel")
+	div.classList.add("block")
+
+	let a = document.createElement("a")
+	a.href = `../#!/${block.slug}`
+
+	let h4 = document.createElement("h4")
+	h4.textContent = block.title
+
+	a.appendChild(h4)
+	div.appendChild(a)
+	return div
+}
 
 filters.media = (block) => block.class == 'Media'
-views.media = (block) => `
-<div class='media block'>
-	<span class='tag'>media </span>
-	<h4>${block.title}</h4>
-</div>
-`
+views.media = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("media")
+	div.classList.add("block")
+
+	let span = document.createElement("span")
+	span.classList.add("tag")
+	span.textContent = "media "
+
+	let h4 = document.createElement("h4")
+	h4.textContent = block.title
+
+	div.appendChild(span)
+	div.appendChild(h4)
+	return div
+}
 
 filters.attachment = (block) => block.class == 'Attachment'
-views.attachment = (block) => `
-<div class='attachment block'>
-	<span class='tag'>attachment </span>
-	<h4>${block.title}</h4>
-</div>
-`
+views.attachment = (block) => {
+	let div = document.createElement("div")
+	div.classList.add("attachment")
+	div.classList.add("block")
 
+	let span = document.createElement("span")
+	span.classList.add("tag")
+	span.textContent = "attachment "
+
+	let h4 = document.createElement("h4")
+	h4.textContent = block.title
+
+	div.appendChild(span)
+	div.appendChild(h4)
+	return div
+}
 export let what_computers = {filters, views}
